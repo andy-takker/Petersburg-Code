@@ -1,0 +1,8 @@
+version: '3.9'
+services:
+  backend:
+    image: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    privileged: true
