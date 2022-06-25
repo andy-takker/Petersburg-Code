@@ -1,0 +1,4 @@
+
+class DigitalSpbAPI:
+    url = ""
+    
