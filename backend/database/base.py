@@ -1,6 +1,6 @@
 import re
 
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, Integer, BigInteger
 from sqlalchemy.orm import as_declarative, declared_attr
 
 
@@ -8,7 +8,7 @@ from sqlalchemy.orm import as_declarative, declared_attr
 class Base:
     __name__: str
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(BigInteger, primary_key=True, index=True)
 
     @declared_attr
     def __tablename__(cls) -> str:

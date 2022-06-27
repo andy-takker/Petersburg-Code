@@ -121,6 +121,13 @@ services:
     volumes:
       - ./logs:/backend/logs
 
+  nginx:
+    image: nginx
+    build:
+      context: docker/nginx
+      dockerfile: Dockerfile
+
+
 volumes:
   redis_data:
     driver: local
