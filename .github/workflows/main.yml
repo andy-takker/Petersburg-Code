@@ -31,7 +31,8 @@ jobs:
             cd petersburg-code/
             git reset --hard
             git pull
-            docker-compose up --build -d
+            docker-compose build --no-cache
+            docker-compose up -d
           EOF
       - name: Send Telegram Bot message
         env:
@@ -41,5 +42,5 @@ jobs:
           echo "System was updated"
           curl -X POST \
             -H 'Content-Type: application/json' \
-            -d '{"chat_id": "'"$TELEGRAM_GROUP_ID"'", "text": "System was updated!\n\nCommit: ${{ github.event.head_commit.message }}\nAuthor: ${{ github.event.pusher.name }}", "disable_notification": true}' \
+            -d '{"parse_mode": "markdown", "chat_id": "'"$TELEGRAM_GROUP_ID"'", "text": "System was updated!\n\n**Commit:** ${{ github.event.head_commit.message }}\n**Author:** ${{ github.event.pusher.name }}"}' \
             "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"
