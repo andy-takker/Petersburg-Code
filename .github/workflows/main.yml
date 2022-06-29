@@ -41,5 +41,5 @@ jobs:
           echo "System was updated"
           curl -X POST \
             -H 'Content-Type: application/json' \
-            -d '{"chat_id": "'"$TELEGRAM_GROUP_ID"'", "text": "Commit: ${{ github.event.head_commit.message }} \n\nSystem was updated!", "disable_notification": true}' \
+            -d '{"chat_id": "'"$TELEGRAM_GROUP_ID"'", "text": "System was updated!\n\nCommit: ${{ github.event.head_commit.message }}\nAuthor: ${{ github.event.pusher.name }}", "disable_notification": true}' \
             "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage"
