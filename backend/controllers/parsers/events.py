@@ -7,9 +7,10 @@ from typing import List, Optional
 import requests
 from bs4 import BeautifulSoup
 
-from api.schemas.contest import ImportContest
+from api.schemas.event import ImportEvent
 from celery_worker.celery_conf import celery as celery_app
-from database import Source, Contest
+from controllers.parsers.base import Parser
+from database import Source, Event
 from database.engine import Session
 
 logger = logging.getLogger(__name__)
@@ -79,12 +80,12 @@ def get_deadline(article):
         return deadline_datetime
 
 
-class VseKonkursyParser:
-    contests: List[ImportContest]
+class VseKonkursyParser(Parser):
+    events: List[ImportEvent]
 
     def __init__(self, source_url: str):
         self.urls = []
-        self.contests = []
+        self.events = []
         self.source_url = source_url
         self.source_id = 1
 
@@ -95,10 +96,10 @@ class VseKonkursyParser:
             for article in soup.find_all('article'):
                 self.urls.append(article.find('a')['href'])
 
-    def parse(self):
+    def parse_data(self):
         self.parse_last_contest_urls()
         for url in self.urls:
-            self.contests.append(self.parse_contest(contest_url=url))
+            self.events.append(self.parse_contest(contest_url=url))
 
     def parse_contest(self, contest_url):
         r = requests.get(contest_url)
@@ -110,7 +111,7 @@ class VseKonkursyParser:
         deadline = get_deadline(article)
         organizer = get_organizer(article)
 
-        return ImportContest(
+        return ImportEvent(
             name=title,
             source_url=contest_url,
             url=url,
@@ -119,6 +120,13 @@ class VseKonkursyParser:
             comment=organizer,
             source_id=self.source_id,
         )
+
+    def save_data(self, session: Session):
+        for event in self.events:
+            url = event.url
+            if not session.query(Event).filter_by(url=url).first():
+                session.add(Event(**event.dict()))
+        session.commit()
 
 
 @celery_app.task(bind=True, name='parse_contests', track_started=True)
@@ -132,11 +140,6 @@ def make_parse(self, source_id: int):
         logger.error('Source not found!')
         return
     parser = VseKonkursyParser(source_url=source.url)
-    parser.parse()
-
-    for contest in parser.contests:
-        url = contest.url
-        if not session.query(Contest).filter_by(url=url).first():
-            session.add(Contest(**contest.dict()))
-    session.commit()
-    logger.info('Contests were updated!')
+    parser.parse_data()
+    parser.save_data(session=session)
+    logger.info('Events were updated!')

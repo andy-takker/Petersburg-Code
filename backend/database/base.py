@@ -1,11 +1,13 @@
 import re
 
-from sqlalchemy import Column, Integer, BigInteger
-from sqlalchemy.orm import as_declarative, declared_attr
+from celery_sqlalchemy_scheduler.session import ModelBase
+from sqlalchemy import Column, BigInteger
+from sqlalchemy.orm import declared_attr, as_declarative
 
 
 @as_declarative()
-class Base:
+class Base():
+    __metadata__ = ModelBase
     __name__: str
 
     id = Column(BigInteger, primary_key=True, index=True)

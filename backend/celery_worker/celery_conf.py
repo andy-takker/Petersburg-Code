@@ -12,6 +12,6 @@ celery.config_from_object({
     'task_track_started': True,
     'timezone': 'Europe/Moscow',
     'beat_dburi': settings.CELERY_DBURI,
-    'include': ['controllers.parser'],
+    'include': ['controllers.parsers'],
     'worker_max_tasks_per_child': 100,
 })
