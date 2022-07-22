@@ -23,6 +23,7 @@ alembic revision --autogenerate -m "Name of migration"
 docker-compose exec backend alembic revision --autogenerate -m "Name of migration"
 ```
 
+
 #### Применение миграции
 
 Для обновления/инициализации таблиц через миграции выполните команду
