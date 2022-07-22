@@ -12,12 +12,12 @@ from sqlalchemy.orm import selectinload
 from api.schemas.event import AddUpdateEvent
 from database import User, Event, UserEvent
 from database.dao.utils import check_user, check_event
-from database.engine import get_session
+from database.engine import get_async_session
 
 
 class UserDAO:
 
-    def __init__(self, session: AsyncSession = Depends(get_session)):
+    def __init__(self, session: AsyncSession = Depends(get_async_session)):
         self.session = session
 
     @check_user

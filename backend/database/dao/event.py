@@ -5,13 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
-from database.engine import get_session
+from database.engine import get_async_session
 from database.models import Event
 
 
 class EventDAO:
 
-    def __init__(self, session: AsyncSession = Depends(get_session)):
+    def __init__(self, session: AsyncSession = Depends(get_async_session)):
         self.session = session
 
     async def get_all_events(self, limit: int, offset: int):

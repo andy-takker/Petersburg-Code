@@ -1,6 +1,6 @@
 import abc
 
-from database.engine import Session
+from sqlalchemy.orm import Session
 
 
 class Parser(abc.ABC):

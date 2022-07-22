@@ -15,14 +15,12 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_HOST: ${POSTGRES_HOST}
 
   redis:
     image: redis
     restart: on-failure
     command: "redis-server --requirepass ${REDIS_PASSWORD}"
     environment:
-      REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     ports:
@@ -49,19 +47,19 @@ services:
         SERVER_NAME: ${SERVER_NAME}
         VERSION: ${VERSION}
         APP_PORT: ${APP_PORT}
-
-        POSTGRES_HOST: ${POSTGRES_HOST}
+  
+        POSTGRES_HOST: database
         POSTGRES_PORT: ${POSTGRES_PORT}
         POSTGRES_DB: ${POSTGRES_DB}
         POSTGRES_USER: ${POSTGRES_USER}
         POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
-        REDIS_HOST: ${REDIS_HOST}
+  
+        REDIS_HOST: redis
         REDIS_PORT: ${REDIS_PORT}
         REDIS_PASSWORD: ${REDIS_PASSWORD}
-
+  
         DIGITAL_SPB_TOKEN: ${DIGITAL_SPB_TOKEN}
-
+        VK_CLIENT_SECRET: ${VK_CLIENT_SECRET}
     ports:
       - "${APP_PORT}:${APP_PORT}"
     privileged: true
@@ -72,24 +70,6 @@ services:
     depends_on:
       - database
       - redis
-    environment:
-      DEBUG: ${DEBUG}
-      PROJECT_NAME: ${PROJECT_NAME}
-      SERVER_NAME: ${SERVER_NAME}
-      VERSION: ${VERSION}
-      APP_PORT: ${APP_PORT}
-
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-
-      DIGITAL_SPB_TOKEN: ${DIGITAL_SPB_TOKEN}
     volumes:
       - ./logs:/backend/logs
 
@@ -100,24 +80,6 @@ services:
       - database
       - redis
       - celery_worker
-    environment:
-      DEBUG: ${DEBUG}
-      PROJECT_NAME: ${PROJECT_NAME}
-      SERVER_NAME: ${SERVER_NAME}
-      VERSION: ${VERSION}
-      APP_PORT: ${APP_PORT}
-
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-
-      DIGITAL_SPB_TOKEN: ${DIGITAL_SPB_TOKEN}
     volumes:
       - ./logs:/backend/logs
 

@@ -1,7 +1,9 @@
 import logging
 
+from sqlalchemy.orm import Session
+
 from controllers.parsers.base import Parser
-from database.engine import Session
+from database.engine import get_session
 from celery_worker.celery_conf import celery as celery_app
 
 logger = logging.getLogger(__name__)
@@ -20,5 +22,5 @@ class ProgramParser(Parser):
 
 @celery_app.task(bind=True, name='parse_programs', track_started=True)
 def make_parse(self):
-    session = Session()
-    logger.info('Programs were updated')
+    with get_session() as session:
+        logger.info('Programs were updated')

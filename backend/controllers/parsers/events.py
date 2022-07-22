@@ -6,12 +6,13 @@ from typing import List, Optional
 
 import requests
 from bs4 import BeautifulSoup
+from sqlalchemy.orm import Session
 
 from api.schemas.event import ImportEvent
 from celery_worker.celery_conf import celery as celery_app
 from controllers.parsers.base import Parser
 from database import Source, Event
-from database.engine import Session
+from database.engine import get_session
 
 logger = logging.getLogger(__name__)
 
@@ -131,15 +132,15 @@ class VseKonkursyParser(Parser):
 
 @celery_app.task(bind=True, name='parse_events', track_started=True)
 def make_parse(self, source_id: int):
-    session = Session()
-    source: Optional[Source] = session.query(Source).filter_by(
-        id=source_id,
-        enable=True,
-    ).first()
-    if source is None:
-        logger.error('Source not found!')
-        return
-    parser = VseKonkursyParser(source_url=source.url)
-    parser.parse_data()
-    parser.save_data(session=session)
-    logger.info('Events were updated!')
+    with get_session() as session:
+        source: Optional[Source] = session.query(Source).filter_by(
+            id=source_id,
+            enable=True,
+        ).first()
+        if source is None:
+            logger.error('Source not found!')
+            return
+        parser = VseKonkursyParser(source_url=source.url)
+        parser.parse_data()
+        parser.save_data(session=session)
+        logger.info('Events were updated!')
