@@ -16,11 +16,6 @@ engine = create_engine(url=settings.CELERY_DBURI)
 Session = sessionmaker(engine, autocommit=False)
 
 
-
-async def init_models():
-    pass
-
-
 async def get_session() -> AsyncGenerator:
     async_session = sessionmaker(
         async_engine, class_=AsyncSession, expire_on_commit=False,

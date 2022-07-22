@@ -129,7 +129,7 @@ class VseKonkursyParser(Parser):
         session.commit()
 
 
-@celery_app.task(bind=True, name='parse_contests', track_started=True)
+@celery_app.task(bind=True, name='parse_events', track_started=True)
 def make_parse(self, source_id: int):
     session = Session()
     source: Optional[Source] = session.query(Source).filter_by(

@@ -2,6 +2,8 @@ from functools import wraps
 from typing import Optional
 
 from fastapi import Depends, HTTPException
+from fastapi_pagination.ext.async_sqlalchemy import paginate
+from fastapi_pagination.limit_offset import Params
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -23,8 +25,8 @@ class UserDAO:
         return await self.session.get(User, user_id)
 
     @check_user
-    async def get_user_events(self, user_id: int, is_favorite: bool,
-                              is_involved: bool) -> list[Event]:
+    async def get_user_events(self, user_id: int, limit: int, offset: int, is_favorite: bool,
+                              is_involved: bool):
         """Возвращает список событий пользователя"""
         query = select(UserEvent) \
             .options(selectinload(UserEvent.event)) \
@@ -33,8 +35,11 @@ class UserDAO:
             query.filter(UserEvent.is_involved == is_involved)
         if is_favorite is not None:
             query.filter(UserEvent.is_favorite == is_favorite)
-        result = await self.session.execute(query)
-        return result.scalars().all()
+        return await paginate(
+            self.session,
+            query=query,
+            params=Params(limit=limit, offset=offset),
+        )
 
     @check_user
     @check_event

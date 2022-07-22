@@ -12,7 +12,7 @@ router = APIRouter(prefix='/events', tags=['События'])
 
 @router.get('/', response_model=LimitOffsetPage[ExportEvent],
             name='Список событий')
-async def get_events(limit: int, offset: int, actual: bool = False,
+async def get_events(limit: int, offset: int,
                      event_dao: EventDAO = Depends()) -> Any:
     """Возвращает список всех событий постранично"""
     logger.info(f'{limit = } {offset = }')
