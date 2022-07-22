@@ -2,7 +2,7 @@ import os
 from functools import lru_cache
 from typing import Optional, Dict, Any
 
-from pydantic import BaseSettings, PostgresDsn, validator, RedisDsn
+from pydantic import BaseSettings, PostgresDsn, validator, RedisDsn, Field
 
 
 class Settings(BaseSettings):
@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     VERSION: str
     SERVER_NAME: str
     PROJECT_NAME: str
+    API_DOC_PREFIX: str = Field(default='api')
     ALLOWED_HOSTS: str = None
 
     POSTGRES_USER: str
@@ -34,6 +35,7 @@ class Settings(BaseSettings):
         )
 
     DIGITAL_SPB_TOKEN: str
+    VK_CLIENT_SECRET: str = Field(default='client_secret')
 
     REDIS_HOST: str
     REDIS_PORT: str
@@ -72,4 +74,5 @@ class Settings(BaseSettings):
 
 @lru_cache()
 def get_settings():
-    return Settings(_env_file=os.getenv('ENV_FILE', '../.env'))
+    env_file = os.getenv('ENV_FILE', '../.env')
+    return Settings()

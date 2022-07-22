@@ -1,9 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi_pagination import add_pagination
 from starlette.middleware.cors import CORSMiddleware
 
 from config import get_settings
-from database.engine import init_models
-from api.routers import proektoria_router
+from api.routers import proektoria_router, user_router, event_router
+from errors import http_exception_handler
+from middleware import VKValidationMiddleware
 
 settings = get_settings()
 
@@ -15,6 +17,9 @@ def get_application() -> FastAPI:
         debug=settings.DEBUG,
         version=settings.VERSION,
         description='Код Петербурга',
+        docs_url=f'/{settings.API_DOC_PREFIX}/docs',
+        redoc_url=f'/{settings.API_DOC_PREFIX}/redoc',
+        openapi_url=f'/{settings.API_DOC_PREFIX}/openapi.json',
     )
     application.add_middleware(
         CORSMiddleware,
@@ -23,8 +28,22 @@ def get_application() -> FastAPI:
         allow_methods=['*'],
         allow_headers=['*'],
     )
-    application.add_event_handler('startup', init_models)
+    application.add_middleware(
+        VKValidationMiddleware,
+        client_secret=settings.VK_CLIENT_SECRET,
+        debug=settings.DEBUG,
+        api_doc_prefix=settings.API_DOC_PREFIX,
+    )
+    application.add_exception_handler(
+        exc_class_or_status_code=HTTPException,
+        handler=http_exception_handler,
+    )
+
+    application.add_event_handler('startup', lambda: 3)
+    application.include_router(event_router)
     application.include_router(proektoria_router)
+    application.include_router(user_router)
+    add_pagination(application)
     return application
 
 

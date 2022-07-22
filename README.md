@@ -4,34 +4,36 @@
 ## Город Талантов
 
 
-
-
-### Миграции БД (Alembic)
+### Миграции базы данных 
 
 Управление версиями БД осуществляется с помощью пакета `alembic`.
 
-#### Создани миграции 
+#### Создание миграции
 
-Для автоматического создании миграции при изменении модели данных нужно выполнить:
-
+Для автоматического создания миграции выполните
 ```shell
 alembic revision --autogenerate -m "Name of migration"
 ```
-или при запуске через Docker Compose
+
+если проект запущен локально.
+
+И если запущен через docker compose
 
 ```shell
 docker-compose exec backend alembic revision --autogenerate -m "Name of migration"
 ```
 
-#### Применение миграций
 
-Для обновления/инициализации таблиц через миграции выполните
+#### Применение миграции
+
+Для обновления/инициализации таблиц через миграции выполните команду
 
 ```shell
 alembic upgrade head
 ```
-для Docker Compose
 
-```
+или для docker compose
+
+```shell
 docker-compose exec backend alembic upgrade head
 ```
