@@ -47,6 +47,8 @@ services:
         SERVER_NAME: ${SERVER_NAME}
         VERSION: ${VERSION}
         APP_PORT: ${APP_PORT}
+
+        API_DOC_PREFIX: ${API_DOC_PREFIX}
   
         POSTGRES_HOST: database
         POSTGRES_PORT: ${POSTGRES_PORT}
@@ -84,10 +86,13 @@ services:
       - ./logs:/backend/logs
 
   nginx:
-    image: nginx
     build:
       context: docker/nginx
       dockerfile: Dockerfile
+    ports:
+      - "1337:80"
+    depends_on:
+      - backend
 
 
 volumes:

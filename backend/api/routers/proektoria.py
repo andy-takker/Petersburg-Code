@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from api.schemas.profession import ProfessionList
+from api.schemas.profession import Proektoria
 from api.schemas.skill import SkillList
 from controllers.proektoria import ProektoriaAPI
 
@@ -14,7 +14,7 @@ def get_skills():
     return proektoria.get_suits()
 
 
-@router.post(path='/skills', response_model=ProfessionList,
+@router.post(path='/skills', response_model=Proektoria,
              name='Подбор профессии')
 def post_skills(skills: SkillList):
     """Определяет подходящие под навыки профессии"""

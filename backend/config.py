@@ -75,4 +75,4 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings():
     env_file = os.getenv('ENV_FILE', '../.env')
-    return Settings()
+    return Settings(_env_file=env_file)
