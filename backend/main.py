@@ -3,7 +3,7 @@ from fastapi_pagination import add_pagination
 from starlette.middleware.cors import CORSMiddleware
 
 from config import get_settings
-from api.routers import proektoria_router, user_router, event_router
+from api.routers import proektoria_router, event_router, user_router
 from errors import http_exception_handler
 from middleware import VKValidationMiddleware
 

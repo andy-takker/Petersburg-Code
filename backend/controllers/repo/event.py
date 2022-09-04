@@ -9,7 +9,7 @@ from database.engine import get_async_session
 from database.models import Event
 
 
-class EventDAO:
+class EventRepo:
 
     def __init__(self, session: AsyncSession = Depends(get_async_session)):
         self.session = session

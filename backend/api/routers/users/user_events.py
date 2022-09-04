@@ -5,9 +5,9 @@ from fastapi_pagination import LimitOffsetPage
 
 from api.schemas.event import AddUpdateEvent
 from api.schemas.user import ShortUserEvent, FullUserEvent
-from database.dao.user import UserDAO
+from controllers.repo.user import UserRepo
 
-user_event_router = APIRouter(prefix='/{user_id}/events', tags=['UserEvent'])
+user_event_router = APIRouter(prefix='/{user_id}/events', tags=['События пользователей'])
 
 
 @user_event_router.get(
@@ -16,11 +16,11 @@ user_event_router = APIRouter(prefix='/{user_id}/events', tags=['UserEvent'])
     name='Возвращает события пользователя',
 )
 async def get_user_events(limit: int, offset: int,
-        user_id: int,
-        is_favorite: Optional[bool] = None,
-        is_involved: Optional[bool] = None,
-        user_dao: UserDAO = Depends(),
-):
+                          user_id: int,
+                          is_favorite: Optional[bool] = None,
+                          is_involved: Optional[bool] = None,
+                          user_dao: UserRepo = Depends(),
+                          ):
     """
     Возвращает по странично список событий у пользователя
     """
@@ -40,7 +40,7 @@ async def get_user_events(limit: int, offset: int,
 async def create_or_update_user_events(
         user_id: int,
         event: AddUpdateEvent,
-        user_dao: UserDAO = Depends(),
+        user_dao: UserRepo = Depends(),
 ) -> None:
     """
     Создает или обновляет событие в списке пользователя
@@ -56,7 +56,7 @@ async def create_or_update_user_events(
     name='Возвращает полную информацию о событии пользователя',
 )
 async def get_user_event(user_id: int, event_id: int,
-                         user_dao: UserDAO = Depends()):
+                         user_dao: UserRepo = Depends()):
     """
     Возвращает связанную информацию о событии пользователя, включая источник.
     """
@@ -74,14 +74,10 @@ async def get_user_event(user_id: int, event_id: int,
     name='Удаляет событие у пользователя'
 )
 async def delete_user_event(user_id: int, event_id: int,
-                            user_dao: UserDAO = Depends()):
+                            user_dao: UserRepo = Depends()):
     """
     Удаляет событие из списка пользователя.
     При повторном вызове ошибку не выдает!
     """
     await user_dao.delete_user_event(user_id=user_id, event_id=event_id)
     return
-
-
-router = APIRouter(prefix='/users')
-router.include_router(router=user_event_router)

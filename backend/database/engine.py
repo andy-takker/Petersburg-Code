@@ -1,4 +1,3 @@
-import time
 from contextlib import contextmanager
 from typing import AsyncGenerator
 
@@ -7,7 +6,7 @@ from loguru import logger
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker, scoped_session, Session
 
 from config import get_settings
 
@@ -18,7 +17,7 @@ engine = create_engine(url=settings.CELERY_DBURI)
 
 
 @contextmanager
-def get_session():
+def get_session() -> Session:
     connection = engine.connect()
     session = scoped_session(sessionmaker(
         autocommit=False,

@@ -3,7 +3,7 @@ from typing import Optional
 import requests
 
 from api.schemas.skill import SkillList
-from api.schemas.profession import ProfessionList
+from api.schemas.profession import Proektoria
 
 
 class ProektoriaAPI:
@@ -14,9 +14,8 @@ class ProektoriaAPI:
         if result.ok:
             return SkillList(skills=result.json()['skills'])
 
-    def post_suits(self, skills: SkillList) -> Optional[ProfessionList]:
+    def post_suits(self, skills: SkillList) -> Optional[Proektoria]:
         data = skills.dict()
         result = requests.post(self.url, json=data)
         if result.ok:
-            print(result.json()['related'])
-            return ProfessionList(professions=result.json()['related'])
+            return Proektoria(professions=result.json()['related'])

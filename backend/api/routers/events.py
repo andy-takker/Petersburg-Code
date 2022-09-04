@@ -5,7 +5,7 @@ from fastapi_pagination import LimitOffsetPage
 from loguru import logger
 
 from api.schemas.event import ExportEvent, FullEvent
-from database.dao.event import EventDAO
+from controllers.repo.event import EventRepo
 
 router = APIRouter(prefix='/events', tags=['События'])
 
@@ -13,14 +13,14 @@ router = APIRouter(prefix='/events', tags=['События'])
 @router.get('/', response_model=LimitOffsetPage[ExportEvent],
             name='Список событий')
 async def get_events(limit: int, offset: int,
-                     event_dao: EventDAO = Depends()) -> Any:
+                     event_dao: EventRepo = Depends()) -> Any:
     """Возвращает список всех событий постранично"""
     logger.info(f'{limit = } {offset = }')
     return await event_dao.get_all_events(limit=limit, offset=offset)
 
 
 @router.get('/{event_id}', response_model=FullEvent, name='Событие')
-async def get_event(event_id: int, event_dao: EventDAO = Depends()) -> Any:
+async def get_event(event_id: int, event_dao: EventRepo = Depends()) -> Any:
     """Возвращает всю информацию о событии"""
     logger.info(f'Get event {event_id}')
     event = await event_dao.get_event(event_id=event_id)
