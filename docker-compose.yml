@@ -89,11 +89,14 @@ services:
     build:
       context: docker/nginx
       dockerfile: Dockerfile
+      args:
+        DEBUG: ${DEBUG:-false}
     ports:
       - "1337:80"
     depends_on:
       - backend
-
+    volumes:
+      - ./docker/nginx/ssl/:/etc/nginx/ssl:ro
 
 volumes:
   redis_data:
