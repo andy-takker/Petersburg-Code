@@ -13,7 +13,13 @@ from starlette.types import ASGIApp
 
 class VKValidationMiddleware(BaseHTTPMiddleware):
 
-    def __init__(self, app: ASGIApp, client_secret: str,  api_doc_prefix: str, debug: bool = True):
+    def __init__(
+            self,
+            app: ASGIApp,
+            client_secret: str,
+            api_doc_prefix: str,
+            debug: bool = True,
+    ) -> None:
         super().__init__(app)
         self.app = app
         self.client_secret = client_secret
@@ -26,7 +32,8 @@ class VKValidationMiddleware(BaseHTTPMiddleware):
         is_doc = request.url.path.split('/')[1] == self.api_doc_prefix
         if is_doc or self.debug or self.is_valid(request=request):
             return await call_next(request)
-        return JSONResponse(status_code=403, content={'reason': 'Unauthorized!'})
+        return JSONResponse(status_code=403,
+                            content={'reason': 'Unauthorized!'})
 
     def is_valid(self, request: Request) -> bool:
         vk_subset = OrderedDict(sorted(x for x in request.items()

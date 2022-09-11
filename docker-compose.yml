@@ -92,7 +92,7 @@ services:
       args:
         DEBUG: ${DEBUG:-false}
     ports:
-      - "1337:80"
+      - "${NGINX_PORT}:${NGINX_PORT}"
     depends_on:
       - backend
     volumes:
