@@ -24,6 +24,10 @@ def get_application() -> FastAPI:
     application.add_middleware(
         CORSMiddleware,
         allow_origins=settings.ALLOWED_HOSTS or ['*'],
+        allow_credentials=True,
+        allow_methods=['GET', 'POST', 'DELETE', 'PUT'],
+        allow_headers=['*'],
+        max_age=3600,
     )
     application.add_middleware(
         VKValidationMiddleware,
