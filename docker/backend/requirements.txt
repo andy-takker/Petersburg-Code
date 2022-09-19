@@ -19,6 +19,8 @@ colorama==0.4.5
 commonmark==0.9.1
 Deprecated==1.2.13
 distlib==0.3.6
+dnspython==2.2.1
+email-validator==1.2.1
 fastapi==0.85.0
 fastapi-pagination==0.10.0
 filelock==3.8.0
