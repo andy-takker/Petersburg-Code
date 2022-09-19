@@ -2,7 +2,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 
-from api.routers import proektoria_router, event_router, user_router
+from api.routers import proektoria_router, organization_router, event_router,\
+    study_area_router, user_router, program_router
 from config import get_settings
 from errors import http_exception_handler
 from middleware import VKValidationMiddleware
@@ -42,7 +43,10 @@ def get_application() -> FastAPI:
 
     application.add_event_handler('startup', lambda: 3)
     application.include_router(event_router)
+    application.include_router(organization_router)
     application.include_router(proektoria_router)
+    application.include_router(program_router)
+    application.include_router(study_area_router)
     application.include_router(user_router)
     add_pagination(application)
     return application

@@ -5,7 +5,7 @@ from loguru import logger
 from pydantic import parse_obj_as
 from sqlalchemy.orm import Session
 
-from api.schemas.program import ProgramInput
+from api.schemas.program import ProgramInput, FullProgramSchema
 from config import get_settings
 from database import Directivity, Organization, StudyArea, Program
 from database.engine import get_session
@@ -93,8 +93,9 @@ class DigitalSpbAPI:
         for program in self.programs:
             p: Program | None = session.get(Program, program.id)
             if p is None:
-                p = Program(**program.dict(exclude={'organization','study_areas'})
-                )
+                p = Program(
+                    **program.dict(exclude={'organization', 'study_areas'})
+                    )
                 organization = session.query(Organization).filter_by(
                     name=program.organization).first()
                 p.organization = organization
@@ -103,11 +104,21 @@ class DigitalSpbAPI:
                     StudyArea.name.in_(program.study_areas)).all()
             else:
                 p.update_from_dict(
-                    **program.dict(exclude={'organization','study_areas'})
+                    **program.dict(exclude={'organization', 'study_areas'})
                 )
             session.add(p)
         session.commit()
         logger.info('Saving is ended!')
+
+    def get_education_program_full_info(self, program_id: int) -> FullProgramSchema | None:
+        response = self._get(
+            url=f'{self.PROGRAM_URL}/{program_id}', params={},
+        )
+        if response.ok:
+            result = response.json()
+            if 'detail' not in result['data']:
+                return FullProgramSchema(**result['data'])
+        return None
 
 
 def create_if_not_exist(session: Session, model, **kwargs):

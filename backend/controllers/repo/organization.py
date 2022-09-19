@@ -1,26 +1,24 @@
 from fastapi import Depends
+from fastapi_pagination import Params
 from fastapi_pagination.ext.async_sqlalchemy import paginate
-from fastapi_pagination.limit_offset import Params
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
 
+from database import Organization
 from database.engine import get_async_session
-from database.models import Event
 
 
-class EventRepo:
+class OrganizationRepo:
 
     def __init__(self, session: AsyncSession = Depends(get_async_session)):
         self.session = session
 
-    async def get_all_events(self, limit: int, offset: int):
+    async def get_organization_list(self, limit: int, offset: int, q: str):
+        query = select(Organization)
+        if q is not None:
+            query = query.where(Organization.name.ilike(f'%{q}%'))
         return await paginate(
             self.session,
-            select(Event),
+            query=query.order_by(Organization.name),
             params=Params(limit=limit, offset=offset),
         )
-
-    async def get_event(self, event_id: int) -> Event:
-        return await self.session.get(Event, event_id,
-                                      options=(selectinload(Event.source),))

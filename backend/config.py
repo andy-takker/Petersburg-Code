@@ -1,5 +1,6 @@
 import os
 from functools import lru_cache
+from pathlib import Path
 from typing import Optional, Dict, Any
 
 from pydantic import BaseSettings, PostgresDsn, validator, RedisDsn, Field
@@ -74,5 +75,7 @@ class Settings(BaseSettings):
 
 @lru_cache()
 def get_settings():
-    env_file = os.getenv('ENV_FILE', '../.env')
+    ROOT_PATH = Path(__file__).parent.parent
+    env_file = os.getenv('ENV_FILE', ROOT_PATH / '.env')
+    print(env_file)
     return Settings(_env_file=env_file)

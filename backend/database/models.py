@@ -2,7 +2,7 @@ import enum
 from datetime import timezone
 
 from sqlalchemy import Column, String, DateTime, Boolean, ForeignKey, \
-    UniqueConstraint, Float, Integer, PickleType
+    UniqueConstraint, Float, Integer, PickleType, Table, Index
 from sqlalchemy.orm import relationship, Session
 from sqlalchemy_utils import URLType, ChoiceType
 
@@ -11,10 +11,21 @@ from database.mixins import TimestampMixin
 
 
 class PaymentType(str, enum.Enum):
-    only_paid = "Только платно"
-    paid = "Платно"
-    free = "Бесплатно"
-    part_free = 'Есть бесплатные места'
+    ONLY_PAID = 'Только платно'
+    PAID = 'Платно'
+    FREE = 'Бесплатно'
+    PART_FREE = 'Есть бесплатные места'
+
+
+class EducationType(str, enum.Enum):
+    ADDITIONAL_EDUCATION = 'Дополнительное образование'
+    ADDITIONAL_PROFESSIONAL_EDUCATION = 'Дополнительное профессиональное образование'
+    CAREER_GUIDANCE_FOR_SCHOOLCHILDREN = 'Профориентация для школьников'
+    HIGHER_EDUCATION = 'Высшее образование'
+    OTHER = 'Другое'
+    PREPARATION_FOR_ADMISSION_TO_UNIVERSITY = 'Подготовка к поступлению в вуз'
+    PROFESSIONAL_EDUCATION = 'Профессиональное обучение'
+    SECONDARY_VOCATIONAL_EDUCATION = 'Среднее профессиональное образование'
 
 
 class Directivity(Base):
@@ -85,8 +96,12 @@ class StudyArea(Base):
     name = Column(String, index=True, nullable=False)
     description = Column(String, nullable=True)
 
-    programs = relationship('Program', secondary='study_area_program',
-                            back_populates='study_areas')
+    programs = relationship(
+        'Program',
+        secondary='study_area_program',
+        back_populates='study_areas',
+        viewonly=True,
+    )
 
     def __repr__(self):
         return f'{self.name} ({self.id})'
@@ -107,7 +122,8 @@ class Program(TimestampMixin, Base):
                              nullable=False)
     directivity_id = Column(ForeignKey('directivity.id'), index=True,
                             nullable=False)
-    education_type = Column(String(255), nullable=True)
+    education_type = Column(ChoiceType(EducationType, impl=String()),
+                            nullable=True)
     payment = Column(ChoiceType(PaymentType, impl=String()))
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
@@ -116,16 +132,68 @@ class Program(TimestampMixin, Base):
 
     organization = relationship('Organization', back_populates='programs')
 
-    study_areas = relationship('StudyArea', secondary='study_area_program',
-                               back_populates='programs')
+    study_areas = relationship(
+        'StudyArea',
+        secondary='study_area_program',
+        back_populates='programs',
+        order_by='StudyArea.name',
+    )
+
+    education_profiles = relationship(
+        'EducationProfile',
+        secondary='education_profile_program',
+        back_populates='programs',
+        order_by='EducationProfile.name',
+    )
 
     directivity = relationship('Directivity', back_populates='programs')
 
 
-class StudyAreaProgram(Base):
-    program_id = Column(ForeignKey('program.id'), index=True, nullable=False)
-    study_area_id = Column(ForeignKey('study_area.id'), index=True,
-                           nullable=False)
+Table(
+    'study_area_program',
+    Base.metadata,
+    Column(
+        'program_id',
+        ForeignKey('program.id'),
+        index=True,
+        nullable=False,
+    ),
+    Column(
+        'study_area_id',
+        ForeignKey('study_area.id'),
+        index=True,
+        nullable=False,
+    ),
+)
+
+
+class EducationProfile(Base):
+    name = Column(String, index=True, nullable=False)
+
+    programs = relationship(
+        'Program',
+        secondary='education_profile_program',
+        back_populates='education_profiles',
+        viewonly=True,
+    )
+
+
+Table(
+    'education_profile_program',
+    Base.metadata,
+    Column(
+        'program_id',
+        ForeignKey('program.id'),
+        index=True,
+        nullable=False,
+    ),
+    Column(
+        'education_profile_id',
+        ForeignKey('education_profile.id'),
+        index=True,
+        nullable=False,
+    ),
+)
 
 
 class CareerTest(TimestampMixin, Base):
